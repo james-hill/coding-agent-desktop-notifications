@@ -1,0 +1,13 @@
+# Coding Agent Desktop Notifications configuration
+# Installed from: __INSTALL_DIR__
+# Copied to ~/.notify.yaml on install.
+# Env vars (AGENT_NOTIFY_PORT, AGENT_NOTIFY_URL, etc.) override these values.
+
+enabled: true
+port: 6789
+sound: true
+# url: http://localhost:6789/notify
+
+# Custom JSON payload template.
+# Available variables: ${title}, ${message}, ${sound}
+# payload: '{"title":"${title}","message":"${message}","sound":${sound}}'
