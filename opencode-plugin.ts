@@ -80,13 +80,17 @@ async function notify(title: string, message: string) {
 
 export const DesktopNotificationsPlugin: Plugin = async () => {
   return {
-    "session.idle": async () => {
-      await notify("OpenCode Stopped", basename(process.cwd()))
+    event: async (event) => {
+      switch (event.type) {
+        case "session.idle":
+          await notify("OpenCode Stopped", basename(process.cwd()))
+          break
+        case "session.error":
+          await notify("OpenCode Error", basename(process.cwd()))
+          break
+      }
     },
-    "session.error": async () => {
-      await notify("OpenCode Error", basename(process.cwd()))
-    },
-    "permission.asked": async () => {
+    "permission.ask": async () => {
       await notify("OpenCode Needs Permission", basename(process.cwd()))
     },
   }
