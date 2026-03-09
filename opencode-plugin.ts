@@ -78,17 +78,17 @@ async function notify(title: string, message: string) {
   }
 }
 
-console.error("[desktop-notifications] Plugin loaded")
+console.log("[desktop-notifications] Plugin loaded")
 
 export const DesktopNotificationsPlugin: Plugin = async () => {
-  console.error("[desktop-notifications] Plugin initialized")
+  console.log("[desktop-notifications] Plugin initialized")
   return {
     "session.error": async () => {
-      console.error("[desktop-notifications] session.error fired")
+      console.log("[desktop-notifications] session.error fired")
       await notify("OpenCode Error", basename(process.cwd()))
     },
     "permission.asked": async () => {
-      console.error("[desktop-notifications] permission.asked fired")
+      console.log("[desktop-notifications] permission.asked fired")
       await notify("OpenCode Needs Permission", basename(process.cwd()))
     },
   }
