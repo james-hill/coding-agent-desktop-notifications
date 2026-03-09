@@ -20,6 +20,11 @@ By default the plugin sends JSON payloads to `http://localhost:6789/notify`:
 
 ## Installation
 
+```bash
+git clone https://github.com/james-hill/coding-agent-desktop-notifications.git
+cd coding-agent-desktop-notifications
+```
+
 ### Claude Code
 
 ```bash
@@ -47,6 +52,7 @@ Both installers copy `notify.yaml.template` to `~/.notify.yaml` if it doesn't al
 Edit `~/.notify.yaml`:
 
 ```yaml
+enabled: true
 port: 6789
 sound: true
 # url: http://localhost:6789/notify
@@ -58,6 +64,7 @@ sound: true
 
 | Key | Default | Description |
 |---|---|---|
+| `enabled` | `true` | Enable or disable notifications entirely |
 | `port` | `6789` | Port the bridge server is running on |
 | `sound` | `true` | Enable notification sounds |
 | `url` | `http://localhost:{port}/notify` | Full URL to POST notifications to (overrides port) |

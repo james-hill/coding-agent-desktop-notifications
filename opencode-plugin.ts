@@ -78,7 +78,7 @@ async function notify(title: string, message: string) {
   }
 }
 
-export const BridgeNotifyPlugin: Plugin = async () => {
+export const DesktopNotificationsPlugin: Plugin = async () => {
   return {
     "session.idle": async () => {
       await notify("OpenCode Stopped", basename(process.cwd()))

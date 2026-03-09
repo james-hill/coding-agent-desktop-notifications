@@ -15,7 +15,21 @@ else
 fi
 
 mkdir -p "$DEST_DIR"
-cp "$PLUGIN_SRC" "$DEST_DIR/bridge-notify.ts"
+cp "$PLUGIN_SRC" "$DEST_DIR/desktop-notifications.ts"
+
+# Ensure package.json exists with the plugin dependency
+PARENT_DIR="$(dirname "$DEST_DIR")"
+PKG_FILE="$PARENT_DIR/package.json"
+if [ ! -f "$PKG_FILE" ]; then
+  cat > "$PKG_FILE" <<'PKGJSON'
+{
+  "dependencies": {
+    "@opencode-ai/plugin": "latest"
+  }
+}
+PKGJSON
+  echo "Created $PKG_FILE with plugin dependency"
+fi
 
 CONFIG_SRC="$INSTALL_DIR/notify.yaml.template"
 CONFIG_DEST="$HOME/.notify.yaml"
@@ -37,4 +51,4 @@ if [ -d "$COMMANDS_SRC" ]; then
   echo "Slash commands installed to $COMMANDS_DEST/"
 fi
 
-echo "OpenCode plugin installed to $DEST_DIR/bridge-notify.ts"
+echo "OpenCode plugin installed to $DEST_DIR/desktop-notifications.ts"
