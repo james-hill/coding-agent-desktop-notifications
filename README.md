@@ -26,14 +26,10 @@ This registers shell hooks in `~/.claude/settings.json` that fire on `Stop` and 
 ### OpenCode
 
 ```bash
-# Install to current project
 ./install-opencode.sh
-
-# Install globally
-./install-opencode.sh --global
 ```
 
-This copies the TypeScript plugin to `.opencode/plugins/` (project) or `~/.config/opencode/plugins/` (global). The plugin listens for `session.idle`, `session.error`, and `permission.asked` events.
+This copies the TypeScript plugin to `~/.config/opencode/plugins/`. The plugin listens for `session.idle`, `session.error`, and `permission.asked` events.
 
 Both installers copy `notify.yaml.template` to `~/.config/slack-notifications/notify.yaml` if it doesn't already exist. They also install slash commands so you can manage notifications from within your agent.
 
