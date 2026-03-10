@@ -1,6 +1,8 @@
-Show current desktop notification settings from ~/.notify.yaml and explain the available options.
+Show current desktop notification settings.
 
-The config file is at ~/.notify.yaml. Read it and display:
+The config file path is: `$HOME/.notify.yaml` (use the HOME environment variable to resolve the absolute path).
+
+Read the file and display:
 - Whether notifications are enabled
 - Current port and URL
 - Whether sound is enabled

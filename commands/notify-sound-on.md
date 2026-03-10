@@ -1,3 +1,5 @@
-Enable notification sounds by setting `sound: true` in ~/.notify.yaml.
+Enable notification sounds by setting `sound: true` in the notify config file.
 
-Read ~/.notify.yaml, change the `sound:` line from `false` to `true`, and write it back. If there is no sound line, add `sound: true` after the comment header.
+The config file path is: `$HOME/.notify.yaml` (use the HOME environment variable to resolve the absolute path).
+
+Read the file, change the `sound:` line from `false` to `true`, and write it back. If there is no sound line, add `sound: true` after the comment header.
