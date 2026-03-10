@@ -1,6 +1,6 @@
 Show current desktop notification settings.
 
-The config file path is: `$HOME/.notify.yaml` (use the HOME environment variable to resolve the absolute path).
+First, resolve the config file path by running: `echo "$HOME/.config/desktop-notifications/notify.yaml"` — use the output as the absolute path for all file operations below.
 
 Read the file and display:
 - Whether notifications are enabled

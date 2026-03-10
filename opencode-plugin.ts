@@ -21,7 +21,7 @@ function loadConfig(): Config {
 
   const configPath =
     process.env.AGENT_NOTIFY_CONFIG ??
-    join(homedir(), ".notify.yaml")
+    join(homedir(), ".config", "desktop-notifications", "notify.yaml")
 
   try {
     const content = readFileSync(configPath, "utf-8")

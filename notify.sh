@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CONFIG_FILE="${AGENT_NOTIFY_CONFIG:-$HOME/.notify.yaml}"
+CONFIG_FILE="${AGENT_NOTIFY_CONFIG:-$HOME/.config/desktop-notifications/notify.yaml}"
 
 # Defaults
 ENABLED="true"

@@ -45,11 +45,11 @@ This registers shell hooks in `~/.claude/settings.json` that fire on `Stop` and 
 
 This copies the TypeScript plugin to `.opencode/plugins/` (project) or `~/.config/opencode/plugins/` (global). The plugin listens for `session.idle`, `session.error`, and `permission.asked` events.
 
-Both installers copy `notify.yaml.template` to `~/.notify.yaml` if it doesn't already exist. They also install slash commands so you can manage notifications from within your agent.
+Both installers copy `notify.yaml.template` to `~/.config/desktop-notifications/notify.yaml` if it doesn't already exist. They also install slash commands so you can manage notifications from within your agent.
 
 ## Configuration
 
-Edit `~/.notify.yaml`:
+Edit `~/.config/desktop-notifications/notify.yaml`:
 
 ```yaml
 enabled: true
@@ -89,7 +89,7 @@ These are installed automatically and available inside your agent session:
 | File | Description |
 |---|---|
 | `notify.sh` | Shared notification script that sends payloads to the bridge |
-| `notify.yaml.template` | Config template (copied to `~/.notify.yaml` on install) |
+| `notify.yaml.template` | Config template (copied to `~/.config/desktop-notifications/notify.yaml` on install) |
 | `install-claudecode.sh` | Installer for Claude Code hooks |
 | `opencode-plugin.ts` | OpenCode plugin (TypeScript) |
 | `install-opencode.sh` | Installer for OpenCode plugin |

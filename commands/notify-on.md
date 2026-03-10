@@ -1,6 +1,6 @@
 Re-enable desktop notifications by setting `enabled: true` in the notify config file.
 
-The config file path is: `$HOME/.notify.yaml` (use the HOME environment variable to resolve the absolute path).
+First, resolve the config file path by running: `echo "$HOME/.config/desktop-notifications/notify.yaml"` — use the output as the absolute path for all file operations below.
 
 Read the file, then:
 - If the file does not exist, let the user know there is no config file to update.

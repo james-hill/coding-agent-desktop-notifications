@@ -31,8 +31,9 @@ with open('$SETTINGS', 'w') as f:
 "
 
 CONFIG_SRC="$INSTALL_DIR/notify.yaml.template"
-CONFIG_DEST="$HOME/.notify.yaml"
+CONFIG_DEST="$HOME/.config/desktop-notifications/notify.yaml"
 if [ ! -f "$CONFIG_DEST" ] && [ -f "$CONFIG_SRC" ]; then
+  mkdir -p "$(dirname "$CONFIG_DEST")"
   sed "s|__INSTALL_DIR__|$INSTALL_DIR|g" "$CONFIG_SRC" > "$CONFIG_DEST"
   echo "Config copied to $CONFIG_DEST"
 fi

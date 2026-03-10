@@ -1,6 +1,6 @@
 # Coding Agent Desktop Notifications configuration
 # Installed from: __INSTALL_DIR__
-# Copied to ~/.notify.yaml on install.
+# Copied to ~/.config/desktop-notifications/notify.yaml on install.
 # Env vars (AGENT_NOTIFY_PORT, AGENT_NOTIFY_URL, etc.) override these values.
 
 enabled: true
