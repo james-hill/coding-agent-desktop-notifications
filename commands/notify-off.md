@@ -1,6 +1,6 @@
-Disable desktop notifications by setting `enabled: false` in the notify config file.
+Disable Slack notifications by setting `enabled: false` in the notify config file.
 
-First, resolve the config file path by running: `echo "$HOME/.config/desktop-notifications/notify.yaml"` — use the output as the absolute path for all file operations below.
+First, resolve the config file path by running: `echo "$HOME/.config/slack-notifications/notify.yaml"` — use the output as the absolute path for all file operations below.
 
 Read the file, then:
 - If the file does not exist, let the user know there is no config file to update.

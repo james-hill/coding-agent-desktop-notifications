@@ -5,23 +5,18 @@ import { homedir } from "os"
 
 interface Config {
   enabled: boolean
-  port: string
-  sound: boolean
-  url: string
-  payload?: string
+  webhookUrl: string
 }
 
 function loadConfig(): Config {
   const config: Config = {
     enabled: true,
-    port: "6789",
-    sound: true,
-    url: "",
+    webhookUrl: "",
   }
 
   const configPath =
     process.env.AGENT_NOTIFY_CONFIG ??
-    join(homedir(), ".config", "desktop-notifications", "notify.yaml")
+    join(homedir(), ".config", "slack-notifications", "notify.yaml")
 
   try {
     const content = readFileSync(configPath, "utf-8")
@@ -33,10 +28,7 @@ function loadConfig(): Config {
       const value = raw.replace(/^['"]|['"]$/g, "").trim()
       switch (key) {
         case "enabled": config.enabled = value !== "false"; break
-        case "port": config.port = value; break
-        case "sound": config.sound = value !== "false"; break
-        case "url": config.url = value; break
-        case "payload": config.payload = value; break
+        case "webhook_url": config.webhookUrl = value; break
       }
     }
   } catch {
@@ -44,39 +36,35 @@ function loadConfig(): Config {
   }
 
   // Env vars override config
-  config.port = process.env.AGENT_NOTIFY_PORT ?? config.port
-  config.sound = process.env.AGENT_NOTIFY_SOUND !== undefined
-    ? process.env.AGENT_NOTIFY_SOUND !== "false"
-    : config.sound
-  config.url = process.env.AGENT_NOTIFY_URL ?? (config.url || `http://host.docker.internal:${config.port}/notify`)
+  config.webhookUrl = process.env.WEBHOOK_URL ?? config.webhookUrl
 
   return config
 }
 
-async function notify(title: string, message: string, client?: any) {
+async function notify(title: string, event: any, client?: any) {
   const config = loadConfig()
-  if (!config.enabled) return
+  if (!config.enabled || !config.webhookUrl) return
   try {
-    let body: string
-    if (config.payload) {
-      body = config.payload
-        .replace(/\$\{title\}/g, title)
-        .replace(/\$\{message\}/g, message)
-        .replace(/\$\{sound\}/g, String(config.sound))
-    } else {
-      body = JSON.stringify({ title, message, sound: config.sound })
-    }
-
-    await fetch(config.url, {
+    const project = basename(process.cwd())
+    await fetch(config.webhookUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body,
+      body: JSON.stringify({
+        text: `${title}: ${project}`,
+        blocks: [{
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `*${title}*\n*Project:* ${project}\n*Session ID:* ${event.properties?.sessionId ?? "unknown"}\n*Files modified:* ${event.properties?.filesModified ?? "unknown"}`
+          }
+        }]
+      })
     })
   } catch (err) {
     if (client) {
       await client.app.log({
         body: {
-          service: "desktop-notifications",
+          service: "slack-notifications",
           level: "error",
           message: `Failed to send notification: ${err}`,
         },
@@ -85,10 +73,10 @@ async function notify(title: string, message: string, client?: any) {
   }
 }
 
-export const DesktopNotificationsPlugin: Plugin = async ({ client }) => {
+export const SlackNotificationsPlugin: Plugin = async ({ client }) => {
   await client.app.log({
     body: {
-      service: "desktop-notifications",
+      service: "slack-notifications",
       level: "info",
       message: "Plugin initialized",
     },
@@ -97,13 +85,13 @@ export const DesktopNotificationsPlugin: Plugin = async ({ client }) => {
     event: async ({ event }) => {
       switch (event.type) {
         case "session.idle":
-          await notify("OpenCode Stopped", basename(process.cwd()), client)
+          await notify("OpenCode Session Completed", event, client)
           break
         case "session.error":
-          await notify("OpenCode Error", basename(process.cwd()), client)
+          await notify("OpenCode Error", event, client)
           break
         case "permission.asked":
-          await notify("OpenCode Needs Permission", basename(process.cwd()), client)
+          await notify("OpenCode Needs Permission", event, client)
           break
       }
     },

@@ -8,10 +8,10 @@ DEST_DIR="$HOME/.config/opencode/plugins"
 [ -f "$PLUGIN_SRC" ] || { echo "Error: opencode-plugin.ts not found"; exit 1; }
 
 mkdir -p "$DEST_DIR"
-cp "$PLUGIN_SRC" "$DEST_DIR/desktop-notifications.ts"
+cp "$PLUGIN_SRC" "$DEST_DIR/slack-notifications.ts"
 
 CONFIG_SRC="$INSTALL_DIR/notify.yaml.template"
-CONFIG_DEST="$HOME/.config/desktop-notifications/notify.yaml"
+CONFIG_DEST="$HOME/.config/slack-notifications/notify.yaml"
 if [ ! -f "$CONFIG_DEST" ] && [ -f "$CONFIG_SRC" ]; then
   mkdir -p "$(dirname "$CONFIG_DEST")"
   sed "s|__INSTALL_DIR__|$INSTALL_DIR|g" "$CONFIG_SRC" > "$CONFIG_DEST"
@@ -27,4 +27,4 @@ if [ -d "$COMMANDS_SRC" ]; then
   echo "Slash commands installed to $COMMANDS_DEST/"
 fi
 
-echo "OpenCode plugin installed to $DEST_DIR/desktop-notifications.ts"
+echo "OpenCode plugin installed to $DEST_DIR/slack-notifications.ts"

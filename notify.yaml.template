@@ -1,13 +1,7 @@
-# Coding Agent Desktop Notifications configuration
+# Coding Agent Slack Notifications configuration
 # Installed from: __INSTALL_DIR__
-# Copied to ~/.config/desktop-notifications/notify.yaml on install.
-# Env vars (AGENT_NOTIFY_PORT, AGENT_NOTIFY_URL, etc.) override these values.
+# Copied to ~/.config/slack-notifications/notify.yaml on install.
+# Env vars (SLACK_NOTIFICATIONS_WEBHOOK) override these values.
 
-enabled: true
-port: 6789
-sound: true
-url: http://host.docker.internal:6789/notify
-
-# Custom JSON payload template.
-# Available variables: ${title}, ${message}, ${sound}
-# payload: '{"title":"${title}","message":"${message}","sound":${sound}}'
+enabled: false
+webhook_url: https://hooks.slack.com/services/YOUR/WEBHOOK/URL

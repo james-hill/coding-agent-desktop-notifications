@@ -1,13 +1,10 @@
 #!/bin/bash
 
-CONFIG_FILE="${AGENT_NOTIFY_CONFIG:-$HOME/.config/desktop-notifications/notify.yaml}"
+CONFIG_FILE="${AGENT_NOTIFY_CONFIG:-$HOME/.config/slack-notifications/notify.yaml}"
 
 # Defaults
 ENABLED="true"
-PORT="6789"
-SOUND="true"
-URL=""
-PAYLOAD_TEMPLATE=""
+WEBHOOK_URL=""
 
 # Parse simple YAML (flat key: value only)
 if [ -f "$CONFIG_FILE" ]; then
@@ -21,10 +18,7 @@ if [ -f "$CONFIG_FILE" ]; then
 
     case "$key" in
       enabled) ENABLED="$value" ;;
-      port) PORT="$value" ;;
-      sound) SOUND="$value" ;;
-      url) URL="$value" ;;
-      payload) PAYLOAD_TEMPLATE="$value" ;;
+      webhook_url) WEBHOOK_URL="$value" ;;
     esac
   done < "$CONFIG_FILE"
 fi
@@ -34,10 +28,13 @@ if [ "$ENABLED" = "false" ]; then
   exit 0
 fi
 
-# Env vars override config file
-PORT="${AGENT_NOTIFY_PORT:-$PORT}"
-SOUND="${AGENT_NOTIFY_SOUND:-$SOUND}"
-URL="${AGENT_NOTIFY_URL:-${URL:-http://host.docker.internal:${PORT}/notify}}"
+# Env var overrides config file
+WEBHOOK_URL="${SLACK_NOTIFICATIONS_WEBHOOK:-$WEBHOOK_URL}"
+
+if [ -z "$WEBHOOK_URL" ]; then
+  echo "Error: No webhook URL configured" >&2
+  exit 1
+fi
 
 read_stdin() {
   if [ ! -t 0 ]; then
@@ -46,23 +43,6 @@ read_stdin() {
     if [ -n "$input" ]; then
       echo "$input"
     fi
-  fi
-}
-
-build_payload() {
-  local title="$1"
-  local message="$2"
-
-  if [ -n "$PAYLOAD_TEMPLATE" ]; then
-    echo "$PAYLOAD_TEMPLATE" \
-      | sed "s|\${title}|$(echo "$title" | sed 's/[&/\]/\\&/g')|g" \
-      | sed "s|\${message}|$(echo "$message" | sed 's/[&/\]/\\&/g')|g" \
-      | sed "s|\${sound}|$SOUND|g"
-  else
-    printf '{"title":"%s","message":"%s","sound":%s}' \
-      "$(echo "$title" | sed 's/"/\\"/g')" \
-      "$(echo "$message" | sed 's/"/\\"/g')" \
-      "$SOUND"
   fi
 }
 
@@ -78,16 +58,21 @@ main() {
     project_dir=$(echo "$stdin_data" | grep -o '"cwd"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*: *"//;s/"$//')
   fi
   project_dir="${project_dir:-$PWD}"
-  message="$(basename "$project_dir")"
+  local project_name
+  project_name="$(basename "$project_dir")"
 
   local payload
-  payload=$(build_payload "$title" "$message")
+  payload=$(printf '{"text":"%s: %s","blocks":[{"type":"section","text":{"type":"mrkdwn","text":"*%s*\\n*Project:* %s"}}]}' \
+    "$(echo "$title" | sed 's/"/\\"/g')" \
+    "$(echo "$project_name" | sed 's/"/\\"/g')" \
+    "$(echo "$title" | sed 's/"/\\"/g')" \
+    "$(echo "$project_name" | sed 's/"/\\"/g')")
 
-  curl -sf -X POST "$URL" \
+  curl -sf -X POST "$WEBHOOK_URL" \
     -H "Content-Type: application/json" \
     -d "$payload" >/dev/null 2>&1
 
-  echo "Notification sent: ${title} - ${message}"
+  echo "Notification sent: ${title} - ${project_name}"
 }
 
 main "$@"
