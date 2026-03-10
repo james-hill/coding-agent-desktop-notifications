@@ -21,7 +21,7 @@ cd coding-agent-slack-notifications
 ./install-claudecode.sh
 ```
 
-This registers shell hooks in `~/.claude/settings.json` that fire on `Stop` and `Notification` events.
+This registers hooks in `~/.claude/settings.json` that fire on `Stop` and `Notification` events.
 
 ### OpenCode
 
@@ -40,14 +40,21 @@ Edit `~/.config/slack-notifications/notify.yaml`:
 ```yaml
 enabled: true
 webhook_url: https://hooks.slack.com/services/YOUR/WEBHOOK/URL
+debounce_seconds: 10
 ```
 
 | Key | Default | Description |
 |---|---|---|
-| `enabled` | `true` | Enable or disable notifications entirely |
+| `enabled` | `false` | Enable or disable notifications entirely |
 | `webhook_url` | _(none)_ | Slack incoming webhook URL |
+| `debounce_seconds` | `10` | Debounce window — waits this many seconds and only sends if no newer event occurs |
 
-The environment variable `SLACK_NOTIFICATIONS_WEBHOOK` overrides the config file.
+The following environment variables override config file values. Set them in your shell profile (e.g. `~/.zshrc`) or in a `.env` file if you're using Docker Compose.
+
+| Variable | Overrides |
+|---|---|
+| `SLACK_NOTIFICATIONS_WEBHOOK` | `webhook_url` |
+| `SLACK_NOTIFICATIONS_DEBOUNCE_SECONDS` | `debounce_seconds` |
 
 ## Slash Commands
 
@@ -62,7 +69,7 @@ These are installed automatically and available inside your agent session:
 
 | File | Description |
 |---|---|
-| `notify.sh` | Shared notification script that posts to Slack |
+| `notify.py` | Shared notification script that posts to Slack |
 | `notify.yaml.template` | Config template (copied to `~/.config/slack-notifications/notify.yaml` on install) |
 | `install-claudecode.sh` | Installer for Claude Code hooks |
 | `opencode-plugin.ts` | OpenCode plugin (TypeScript) |

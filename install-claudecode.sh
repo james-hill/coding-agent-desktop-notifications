@@ -2,10 +2,10 @@
 set -e
 
 INSTALL_DIR="$(cd "$(dirname "$0")" && pwd)"
-SCRIPT="$INSTALL_DIR/notify.sh"
+SCRIPT="$INSTALL_DIR/notify.py"
 SETTINGS="$HOME/.claude/settings.json"
 
-[ -f "$SCRIPT" ] || { echo "Error: notify.sh not found"; exit 1; }
+[ -f "$SCRIPT" ] || { echo "Error: notify.py not found"; exit 1; }
 
 mkdir -p "$HOME/.claude"
 [ -f "$SETTINGS" ] || echo '{}' > "$SETTINGS"
@@ -24,6 +24,7 @@ def hook(args):
 
 s['hooks']['Stop'] = hook('\"Claude Stopped\"')
 s['hooks']['Notification'] = hook('\"Claude Notification\"')
+s['hooks']['UserPromptSubmit'] = hook('--cancel')
 
 with open('$SETTINGS', 'w') as f:
     json.dump(s, f, indent=2)
