@@ -55,7 +55,7 @@ function loadConfig(): Config {
 
 const config = loadConfig()
 
-async function notify(title: string, message: string) {
+async function notify(title: string, message: string, client?: any) {
   if (!config.enabled) return
   try {
     let body: string
@@ -73,8 +73,16 @@ async function notify(title: string, message: string) {
       headers: { "Content-Type": "application/json" },
       body,
     })
-  } catch {
-    // Bridge not running, silently ignore
+  } catch (err) {
+    if (client) {
+      await client.app.log({
+        body: {
+          service: "desktop-notifications",
+          level: "error",
+          message: `Failed to send notification: ${err}`,
+        },
+      })
+    }
   }
 }
 
@@ -88,19 +96,12 @@ export const DesktopNotificationsPlugin: Plugin = async ({ client }) => {
   })
   return {
     event: async ({ event }) => {
-      await client.app.log({
-        body: {
-          service: "desktop-notifications",
-          level: "info",
-          message: `Event received: ${event.type}`,
-        },
-      })
       switch (event.type) {
         case "session.error":
-          await notify("OpenCode Error", basename(process.cwd()))
+          await notify("OpenCode Error", basename(process.cwd()), client)
           break
         case "permission.asked":
-          await notify("OpenCode Needs Permission", basename(process.cwd()))
+          await notify("OpenCode Needs Permission", basename(process.cwd()), client)
           break
       }
     },
