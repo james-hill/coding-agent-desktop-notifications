@@ -97,6 +97,9 @@ export const DesktopNotificationsPlugin: Plugin = async ({ client }) => {
   return {
     event: async ({ event }) => {
       switch (event.type) {
+        case "session.idle":
+          await notify("OpenCode Stopped", basename(process.cwd()), client)
+          break
         case "session.error":
           await notify("OpenCode Error", basename(process.cwd()), client)
           break
