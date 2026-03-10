@@ -37,7 +37,7 @@ fi
 # Env vars override config file
 PORT="${AGENT_NOTIFY_PORT:-$PORT}"
 SOUND="${AGENT_NOTIFY_SOUND:-$SOUND}"
-URL="${AGENT_NOTIFY_URL:-${URL:-http://localhost:${PORT}/notify}}"
+URL="${AGENT_NOTIFY_URL:-${URL:-http://host.docker.internal:${PORT}/notify}}"
 
 read_stdin() {
   if [ ! -t 0 ]; then

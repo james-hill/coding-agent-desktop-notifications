@@ -48,7 +48,7 @@ function loadConfig(): Config {
   config.sound = process.env.AGENT_NOTIFY_SOUND !== undefined
     ? process.env.AGENT_NOTIFY_SOUND !== "false"
     : config.sound
-  config.url = process.env.AGENT_NOTIFY_URL ?? (config.url || `http://localhost:${config.port}/notify`)
+  config.url = process.env.AGENT_NOTIFY_URL ?? (config.url || `http://host.docker.internal:${config.port}/notify`)
 
   return config
 }
