@@ -53,9 +53,8 @@ function loadConfig(): Config {
   return config
 }
 
-const config = loadConfig()
-
 async function notify(title: string, message: string, client?: any) {
+  const config = loadConfig()
   if (!config.enabled) return
   try {
     let body: string
