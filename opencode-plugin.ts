@@ -9,6 +9,15 @@ interface Config {
   debounceSeconds: number
 }
 
+// Module-level client ref for logging — set on plugin init
+let _client: any = null
+
+function pluginLog(level: "info" | "warn" | "error", message: string) {
+  if (_client) {
+    _client.app.log({ body: { service: "slack-notifications", level, message } })
+  }
+}
+
 function loadConfig(): Config {
   const config: Config = {
     enabled: false,
@@ -36,7 +45,7 @@ function loadConfig(): Config {
     }
   } catch (err) {
     if ((err as NodeJS.ErrnoException).code !== "ENOENT") {
-      console.error(`[slack-notifications] Failed to read config: ${err}`)
+      pluginLog("error", `Failed to read config: ${err}`)
     }
   }
 
@@ -59,7 +68,7 @@ async function getLastAssistantMessage(client: any, sessionId: string): Promise<
       }
     }
   } catch (err) {
-    console.error(`[slack-notifications] Failed to fetch session messages: ${err}`)
+    pluginLog("error", `Failed to fetch session messages: ${err}`)
   }
   return ""
 }
@@ -121,15 +130,7 @@ async function notify(title: string, event: any, client?: any) {
       throw new Error(`Slack returned ${resp.status}: ${await resp.text()}`)
     }
   } catch (err) {
-    if (client) {
-      await client.app.log({
-        body: {
-          service: "slack-notifications",
-          level: "error",
-          message: `Failed to send notification: ${err}`,
-        },
-      })
-    }
+    pluginLog("error", `Failed to send notification: ${err}`)
   }
 }
 
@@ -152,13 +153,8 @@ function debouncedNotify(title: string, event: any, client?: any) {
 }
 
 export const SlackNotificationsPlugin: Plugin = async ({ client }) => {
-  await client.app.log({
-    body: {
-      service: "slack-notifications",
-      level: "info",
-      message: "Plugin initialized",
-    },
-  })
+  _client = client
+  pluginLog("info", "Plugin initialized")
   return {
     event: async ({ event }) => {
       switch (event.type) {
@@ -172,8 +168,10 @@ export const SlackNotificationsPlugin: Plugin = async ({ client }) => {
           debouncedNotify("OpenCode Needs Permission", event, client)
           break
         case "message.created":
-        case "session.updated":
-          cancelDebounce()
+          // Only cancel if it's a user message (agent resuming work)
+          if (event.properties?.role === "user") {
+            cancelDebounce()
+          }
           break
       }
     },
