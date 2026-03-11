@@ -41,7 +41,7 @@ function loadConfig(): Config {
   }
 
   // Env vars override config
-  config.webhookUrl = process.env.WEBHOOK_URL ?? config.webhookUrl
+  config.webhookUrl = process.env.SLACK_NOTIFICATIONS_WEBHOOK ?? config.webhookUrl
 
   return config
 }

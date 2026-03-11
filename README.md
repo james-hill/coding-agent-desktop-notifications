@@ -35,7 +35,15 @@ Both installers copy `notify.yaml.template` to `~/.config/slack-notifications/no
 
 ## Configuration
 
-Edit `~/.config/slack-notifications/notify.yaml`:
+The easiest way to configure is with the `/notify-config` slash command from within your agent session:
+
+```
+/notify-config webhook_url https://hooks.slack.com/services/YOUR/WEBHOOK/URL
+/notify-config debounce_seconds 5
+/notify-config                   # show current values
+```
+
+You can also edit `~/.config/slack-notifications/notify.yaml` directly:
 
 ```yaml
 enabled: true
@@ -49,7 +57,7 @@ debounce_seconds: 10
 | `webhook_url` | _(none)_ | Slack incoming webhook URL |
 | `debounce_seconds` | `10` | Debounce window — waits this many seconds and only sends if no newer event occurs |
 
-The following environment variables override config file values. Set them in your shell profile (e.g. `~/.zshrc`) or in a `.env` file if you're using Docker Compose.
+Environment variables override config file values. Set them in your shell profile (e.g. `~/.zshrc`) or in a `.env` file if you're using Docker Compose.
 
 | Variable | Overrides |
 |---|---|
@@ -62,8 +70,10 @@ These are installed automatically and available inside your agent session:
 
 | Command | Description |
 |---|---|
+| `/notify-on` | Enable notifications |
 | `/notify-off` | Disable notifications |
-| `/notify-on` | Re-enable notifications |
+| `/notify-config <key> <value>` | Update `webhook_url` or `debounce_seconds` |
+| `/notify-config` | Show current config values |
 
 ## Files
 
