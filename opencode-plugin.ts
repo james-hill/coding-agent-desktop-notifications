@@ -11,11 +11,19 @@ interface Config {
 
 // Module-level client ref for logging — set on plugin init
 let _client: any = null
+const DEBUG = process.env.SLACK_NOTIFICATIONS_DEBUG === "1" || process.env.SLACK_NOTIFICATIONS_DEBUG === "true"
 
 function pluginLog(level: "info" | "warn" | "error", message: string) {
   if (_client) {
     _client.app.log({ body: { service: "slack-notifications", level, message } })
   }
+}
+
+function debugLog(message: string) {
+  if (!DEBUG) return
+  // Log to stderr so it doesn't interfere with plugin protocol
+  console.error(`[DEBUG] ${message}`)
+  pluginLog("info", `[DEBUG] ${message}`)
 }
 
 function loadConfig(): Config {
@@ -29,6 +37,7 @@ function loadConfig(): Config {
     process.env.AGENT_NOTIFY_CONFIG ??
     join(homedir(), ".config", "slack-notifications", "notify.yaml")
 
+  debugLog(`Loading config from: ${configPath}`)
   try {
     const content = readFileSync(configPath, "utf-8")
     for (const line of content.split("\n")) {
@@ -52,6 +61,7 @@ function loadConfig(): Config {
   // Env vars override config
   config.webhookUrl = process.env.SLACK_NOTIFICATIONS_WEBHOOK ?? config.webhookUrl
 
+  debugLog(`Config loaded: enabled=${config.enabled}, webhookUrl=${config.webhookUrl ? "set" : "empty"}, debounce=${config.debounceSeconds}s`)
   return config
 }
 
@@ -87,7 +97,12 @@ const DEFAULT_ICON = "\u{1F514}"
 
 async function notify(title: string, event: any, client?: any) {
   const config = loadConfig()
-  if (!config.enabled || !config.webhookUrl) return
+  if (!config.enabled || !config.webhookUrl) {
+    debugLog(`notify() skipped: enabled=${config.enabled}, webhookUrl=${config.webhookUrl ? "set" : "empty"}`)
+    return
+  }
+  debugLog(`notify() sending: title="${title}", event.type="${event.type}"`)
+
   try {
     const project = basename(process.cwd())
     const sessionId = event.properties?.sessionId ?? event.properties?.sessionID
@@ -139,6 +154,7 @@ let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
 function cancelDebounce() {
   if (debounceTimer) {
+    debugLog("cancelDebounce() clearing pending timer")
     clearTimeout(debounceTimer)
     debounceTimer = null
   }
@@ -147,7 +163,9 @@ function cancelDebounce() {
 function debouncedNotify(title: string, event: any, client?: any) {
   const config = loadConfig()
   cancelDebounce()
+  debugLog(`debouncedNotify() queued: title="${title}", delay=${config.debounceSeconds}s`)
   debounceTimer = setTimeout(() => {
+    debugLog(`debouncedNotify() timer fired: title="${title}"`)
     debounceTimer = null
     notify(title, event, client)
   }, config.debounceSeconds * 1000)
@@ -155,6 +173,7 @@ function debouncedNotify(title: string, event: any, client?: any) {
 
 export const SlackNotificationsPlugin: Plugin = async ({ client }) => {
   _client = client
+  debugLog("Plugin initializing")
   pluginLog("info", "Plugin initialized")
   return {
     event: async ({ event }) => {
@@ -171,6 +190,7 @@ export const SlackNotificationsPlugin: Plugin = async ({ client }) => {
         case "message.created":
           // Only cancel if it's a user message (agent resuming work)
           if (event.properties?.role === "user") {
+            debugLog("User message detected, cancelling debounce")
             cancelDebounce()
           }
           break
